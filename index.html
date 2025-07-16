@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Curricular Psicología</title>
+  <style>
+    body {
+      background-color: #f2dde4;
+      font-family: Arial, sans-serif;
+      color: #915265;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #915265;
+      margin: 0;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 5px;
+    }
+    h2 {
+      font-size: 1.2em;
+      font-style: normal;
+      margin-bottom: 20px;
+    }
+    .malla {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px;
+      gap: 10px;
+    }
+    .semestre {
+      background-color: #e4c9d2;
+      border-radius: 12px;
+      padding: 10px;
+      min-width: 220px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+    .semestre h3 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .curso {
+      background-color: #e9a8c0;
+      border: 2px solid #915265;
+      color: #915265;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .curso:hover:not(.bloqueado):not(.aprobado) {
+      background-color: #dca2b5;
+    }
+    .bloqueado {
+      background-color: #ccc !important;
+      color: #666 !important;
+      cursor: not-allowed !important;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .aprobado {
+      background-color: #d0aee0 !important;
+      font-style: italic;
+      text-decoration: line-through;
+      cursor: default;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Psicología</h1>
+<h2>Universidad de Santiago de Chile</h2>
+
+<div class="malla" id="malla"></div>
+
+<script>
+const cursos = {
+  'Inglés I': ['Inglés II'],
+  'Inglés II': ['Inglés III'],
+  'Inglés III': ['Inglés IV'],
+
+  'Fundamentos de Investigación Psicológica': ['Metodología Cuantitativa I', 'Metodología Cualitativa I'],
+  'Introducción a la Disciplina Psicología': ['Teorías y Perspectivas Psicológicas I'],
+  'Bases Biológicas de la Psicología': ['Aprendizaje, Memoria y Cognición', 'Afectividad y Motivación'],
+  'Fundamentos Teóricos Sociales de la Psicología': ['Psicología Social I'],
+  'Formación Integral I': ['Formación Integral II'],
+  'Formación Integral II': ['Formación Integral III'],
+  'Formación Integral III': ['Formación Integral IV'],
+  'Formación Integral IV': ['Formación Integral V'],
+  'Formación Integral V': ['Formación Integral VI'],
+
+  'Metodología Cuantitativa I': ['Metodología Cuantitativa II'],
+  'Metodología Cuantitativa II': ['Construcción de Test'],
+  'Teorías y Perspectivas Psicológicas I': ['Teorías y Perspectivas Psicológicas II', 'Ciclo Vital I'],
+  'Teorías y Perspectivas Psicológicas II': ['Teorías de la Personalidad I'],
+  'Ciclo Vital I': ['Ciclo Vital II'],
+  'Ciclo Vital II': ['Psicopatología y Psiquiatría Infanto-Juvenil'],
+  'Psicopatología y Psiquiatría Infanto-Juvenil': ['Psicología Educacional', 'Psicología y Psiquiatría Adulto'],
+  'Psicología y Psiquiatría Adulto': ['Evaluación Psicológica Psicométrica', 'Evaluación Psicológica Proyectiva', 'Psicofarmacología'],
+  'Evaluación Psicológica Psicométrica': ['Diagnóstico Clínico'],
+  'Evaluación Psicológica Proyectiva': ['Diagnóstico Clínico'],
+
+  'Psicología Social I': ['Psicología Social II'],
+  'Psicología Social II': ['Psicología del Trabajo y las Organizaciones', 'Psicología Comunitaria'],
+
+  'Metodología Cualitativa I': ['Metodología Cualitativa II'],
+  'Metodología Cualitativa II': ['Trabajo de Grado'],
+  'Teorías de la Personalidad I': ['Teorías de la Personalidad II'],
+  'Teorías de la Personalidad II': ['Psicología Clínica'],
+
+  'Psicología Comunitaria': [
+    'Profundización Trabajo I', 'Profundización Trabajo II', 'Profundización Trabajo III', 'Profundización Trabajo IV',
+    'Profundización Educacional I', 'Profundización Educacional II', 'Profundización Educacional III', 'Profundización Educacional IV',
+    'Profundización Clínica I', 'Profundización Clínica II', 'Profundización Clínica III', 'Profundización Clínica IV'
+  ],
+
+  'Profundización Clínica IV': ['Profundización Clínica V', 'Profundización Clínica VI', 'Práctica Especialización Clínica'],
+  'Profundización Educacional IV': ['Profundización Educacional V', 'Profundización Educacional VI', 'Práctica Especialización Educacional'],
+  'Profundización Trabajo IV': ['Profundización Trabajo V', 'Profundización Trabajo VI', 'Práctica Especialización Trabajo'],
+
+  'Práctica Especialización Clínica': ['Trabajo de Titulación', 'Práctica Profesional Clínica'],
+  'Práctica Especialización Educacional': ['Trabajo de Titulación', 'Práctica Profesional Educacional'],
+  'Práctica Especialización Trabajo': ['Práctica Profesional Trabajo']
+};
+
+const estructuraSemestres = [
+  ['Inglés I', 'Fundamentos de Investigación Psicológica', 'Introducción a la Disciplina Psicología', 'Bases Biológicas de la Psicología', 'Fundamentos Filosóficos de la Psicología', 'Fundamentos Teóricos Sociales de la Psicología', 'Formación Integral I'],
+  ['Inglés II', 'Metodología Cuantitativa I', 'Teorías y Perspectivas Psicológicas I', 'Aprendizaje, Memoria y Cognición', 'Afectividad y Motivación', 'Formación Integral II'],
+  ['Inglés III', 'Metodología Cuantitativa II', 'Teorías y Perspectivas Psicológicas II', 'Ciclo Vital I', 'Psicología Social I', 'Formación Integral III'],
+  ['Inglés IV', 'Metodología Cualitativa I', 'Teorías de la Personalidad I', 'Ciclo Vital II', 'Psicología Social II', 'Formación Integral IV'],
+  ['Metodología Cualitativa II', 'Teorías de la Personalidad II', 'Psicopatología y Psiquiatría Infanto-Juvenil', 'Construcción de Test', 'Formación Integral V', 'Curso Sello I'],
+  ['Psicología Educacional', 'Psicología y Psiquiatría Adulto', 'Psicología del Trabajo y las Organizaciones', 'Formación Integral VI', 'Curso Sello II'],
+  ['Trabajo de Grado', 'Evaluación Psicológica Psicométrica', 'Evaluación Psicológica Proyectiva', 'Psicofarmacología', 'Psicología Comunitaria'],
+  ['Diagnóstico Clínico', 'Profundización Clínica I', 'Profundización Clínica II', 'Profundización Clínica III', 'Profundización Clínica IV', 'Profundización Educacional I', 'Profundización Educacional II', 'Profundización Educacional III', 'Profundización Educacional IV', 'Profundización Trabajo I', 'Profundización Trabajo II', 'Profundización Trabajo III', 'Profundización Trabajo IV'],
+  ['Intervención Psicosocial', 'Profundización Clínica V', 'Profundización Clínica VI', 'Práctica Especialización Clínica', 'Profundización Educacional V', 'Profundización Educacional VI', 'Práctica Especialización Educacional', 'Profundización Trabajo V', 'Profundización Trabajo VI', 'Práctica Especialización Trabajo'],
+  ['Práctica Profesional Clínica', 'Práctica Profesional Educacional', 'Práctica Profesional Trabajo', 'Trabajo de Titulación']
+];
+
+const estadoCursos = {};
+
+function renderMalla() {
+  const mallaDiv = document.getElementById('malla');
+  mallaDiv.innerHTML = '';
+
+  estructuraSemestres.forEach((cursosSemestre, index) => {
+    const columna = document.createElement('div');
+    columna.className = 'semestre';
+    columna.innerHTML = `<h3>Semestre ${index + 1}</h3>`;
+
+    cursosSemestre.forEach(curso => {
+      const divCurso = document.createElement('div');
+      divCurso.className = 'curso bloqueado';
+      divCurso.textContent = curso;
+      divCurso.id = curso;
+      estadoCursos[curso] = 'bloqueado';
+
+      divCurso.onclick = () => {
+        if (estadoCursos[curso] !== 'activo') return;
+        divCurso.classList.add('aprobado');
+        estadoCursos[curso] = 'aprobado';
+        desbloquear(curso);
+      };
+
+      columna.appendChild(divCurso);
+    });
+
+    mallaDiv.appendChild(columna);
+  });
+
+  // Semestre 1 desbloqueado completo
+  estructuraSemestres[0].forEach(curso => activarCurso(curso));
+
+  // Cursos desbloqueados por defecto sin prerequisitos
+  activarCurso('Curso Sello I');
+  activarCurso('Curso Sello II');
+  activarCurso('Intervención Psicosocial');
+}
+
+function activarCurso(curso) {
+  const divCurso = document.getElementById(curso);
+  if (divCurso) {
+    divCurso.classList.remove('bloqueado');
+    estadoCursos[curso] = 'activo';
+  }
+}
+
+function desbloquear(curso) {
+  if (cursos[curso]) {
+    cursos[curso].forEach(sig => {
+      if (estadoCursos[sig] === 'bloqueado') activarCurso(sig);
+    });
+  }
+}
+
+renderMalla();
+</script>
+
+</body>
+</html>
+
